@@ -3,14 +3,14 @@ sudo: true
 
 matrix:
   include:
-    - os: osx
-      osx_image: xcode11.2
-      env: NODEJS_VERSION=11 NDK=r18b
-      if: NOT tag IS present OR tag !~ /^(daily)/
-      addons:
-        homebrew:
-          taps: homebrew/cask-versions
-          casks: adoptopenjdk8
+    # - os: osx
+    #   osx_image: xcode11.2
+    #   env: NODEJS_VERSION=11 NDK=r18b
+    #   if: NOT tag IS present OR tag !~ /^(daily)/
+    #   addons:
+    #     homebrew:
+    #       taps: homebrew/cask-versions
+    #       casks: adoptopenjdk8
 
     # - os: osx
     #   language: cpp
@@ -88,13 +88,7 @@ before_install:
       export ANDROID_NDK_HOME=$ANDROID_HOME/ndk-bundle;
     fi
 
-  - if [[ "$TRAVIS_EVENT_TYPE" == "cron" && "$TRAVIS_BRANCH" == "master" && "$DEPLOY" != "" ]]; then
-      .ci_scripts/checkCommit.sh;
-      ret=$?;
-      if [[ "$ret" -ne 1 ]]; then
-        echo "no commit, do not upload apk!";
-        DEPLOY="";
-      fi;
+  - if [[ "$DEPLOY" != "" ]]; then
       openssl aes-256-cbc -K $encrypted_77a9a519d93d_key -iv $encrypted_77a9a519d93d_iv -in trinity.jks.enc -out trinity.jks -d;
       export APPSUFFIX=$(date +'%Y%m%d%H')-$(git log --format=%h -1);
       export APPNAME=Trinity-${APPSUFFIX}.apk;
@@ -155,6 +149,7 @@ deploy:
   prerelease: true
   on:
     condition: $DEPLOY != ""
+    branch: release2github
 
 env:
   global:
